@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 input;
+    private PaintBlock nearbyPaintBlock;
 
     void Awake()
     {
@@ -30,6 +31,11 @@ public class PlayerMovement : MonoBehaviour
 
             if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
                 input.y = 1;
+
+            if (Keyboard.current.eKey.wasPressedThisFrame && nearbyPaintBlock != null)
+            {
+                Destroy(nearbyPaintBlock.gameObject);
+            }
         }
 
         input = input.normalized;
@@ -38,5 +44,23 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         rb.linearVelocity = input * speed;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        PaintBlock paintBlock = collision.gameObject.GetComponent<PaintBlock>();
+        if (paintBlock != null)
+        {
+            nearbyPaintBlock = paintBlock;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        PaintBlock paintBlock = collision.gameObject.GetComponent<PaintBlock>();
+        if (paintBlock != null && nearbyPaintBlock == paintBlock)
+        {
+            nearbyPaintBlock = null;
+        }
     }
 }
